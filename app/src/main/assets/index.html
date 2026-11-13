@@ -1,0 +1,595 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Sourdough Calculator</title>
+<style>
+:root{
+  --bg:#14161c;--card:#1d2028;--card2:#262a34;--line:#323744;--text:#eef0f4;--muted:#9aa1b0;
+  --accent:#d9792b;--accent2:#f0a35e;--good:#9cb87a;--warn:#e0a03a;--bad:#e06a5a;--onaccent:#fff;
+}
+body.light{--bg:#f6f2ec;--card:#ffffff;--card2:#f1ebe2;--line:#e1d8cb;--text:#2a221b;--muted:#7a6e62;--accent:#c4651c;--accent2:#c4651c;}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;background:var(--bg);color:var(--text);font:15px/1.4 system-ui,-apple-system,Roboto,sans-serif}
+header{position:sticky;top:0;z-index:5;background:var(--bg);display:flex;align-items:center;gap:8px;padding:10px 12px;border-bottom:1px solid var(--line)}
+header .logo{width:34px;height:34px;border-radius:9px;background:var(--accent);display:grid;place-items:center;font-size:20px}
+header h1{font-size:17px;margin:0;flex:1;line-height:1.1}
+header h1 small{display:block;font-size:11px;color:var(--muted);font-weight:400}
+.hbtn{background:var(--card2);border:1px solid var(--line);color:var(--text);border-radius:9px;min-width:38px;height:36px;padding:0 9px;font-size:14px}
+.hbtn.on{background:var(--accent);border-color:var(--accent);color:var(--onaccent)}
+main{padding:12px;max-width:640px;margin:0 auto}
+.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:14px;margin-bottom:12px}
+.card h2{font-size:16px;margin:0 0 10px;display:flex;align-items:center;gap:8px}
+.card h2 .sp{flex:1}
+label.l{display:block;font-weight:600;margin:14px 0 6px;font-size:14px}
+label.l:first-child{margin-top:0}
+.seg{display:grid;gap:8px}
+.seg.c2{grid-template-columns:1fr 1fr}
+.seg button,.chips button{background:var(--card2);border:1px solid var(--line);color:var(--text);border-radius:10px;padding:11px 6px;font-size:14px}
+.seg button.on{border-color:var(--accent);background:color-mix(in srgb,var(--accent) 22%,var(--card2));color:var(--text);font-weight:600}
+.chips{display:flex;gap:6px}
+.chips button{flex:1;padding:6px 2px;font-size:13px}
+.chips button.on{background:var(--accent);border-color:var(--accent);color:var(--onaccent)}
+input[type=number],input[type=text],select,textarea{width:100%;background:var(--card2);border:1px solid var(--line);color:var(--text);border-radius:10px;padding:11px;font-size:16px;font-family:inherit}
+textarea{min-height:90px;resize:vertical}
+.hint{font-size:12px;color:var(--muted);margin-top:4px}
+.slider{display:flex;align-items:center;gap:8px;margin-top:8px}
+.slider button{width:34px;height:34px;border-radius:9px;border:1px solid var(--line);background:var(--card2);color:var(--text);font-size:18px;flex:none}
+input[type=range]{flex:1;accent-color:var(--accent);height:28px}
+.sv{text-align:center;font-weight:700;margin-top:2px}
+.sv small{display:block;font-weight:400;color:var(--accent2);font-size:12px}
+.mm{display:flex;justify-content:space-between;font-size:11px;color:var(--muted);margin-top:-2px}
+.blend .row{display:flex;gap:6px;margin-bottom:6px;align-items:center}
+.blend select{flex:1;padding:9px}
+.blend input{width:76px;flex:none;padding:9px}
+.blend .x{background:none;border:none;color:var(--muted);font-size:20px;width:30px}
+.blend .tot{font-size:12px;font-weight:600}
+.tot.ok{color:var(--good)}.tot.bad{color:var(--bad)}
+.lnk{background:none;border:1px dashed var(--line);color:var(--accent2);border-radius:10px;padding:8px;width:100%;font-size:14px;margin-top:2px}
+.btn{background:var(--card2);border:1px solid var(--line);color:var(--text);border-radius:10px;padding:10px 14px;font-size:14px}
+.btn.p{background:var(--accent);border-color:var(--accent);color:var(--onaccent);font-weight:600}
+.btn.sm{padding:6px 10px;font-size:13px}
+.grid3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px}
+.grid3 label{font-size:12px;color:var(--muted)}
+table{width:100%;border-collapse:collapse}
+td{padding:7px 0;border-bottom:1px solid var(--line);vertical-align:top}
+td:last-child{text-align:right;font-weight:700;white-space:nowrap;padding-left:8px}
+tr.sub td{font-size:13px;color:var(--muted);font-weight:400;padding:2px 0 2px 12px;border:none}
+tr.tot td{font-weight:700}
+.sec{font-size:11px;letter-spacing:.08em;color:var(--muted);font-weight:700;margin:14px 0 2px}
+.warn{background:color-mix(in srgb,var(--bad) 18%,transparent);border:1px solid var(--bad);padding:8px 10px;border-radius:10px;font-size:13px;margin-top:8px}
+.summ{display:grid;grid-template-columns:1fr 1fr;gap:4px 12px;font-size:13px;color:var(--muted)}
+.summ b{color:var(--text)}
+.steps .st{display:flex;gap:8px;align-items:flex-start;margin-bottom:8px}
+.steps .n{width:26px;height:26px;border-radius:50%;background:var(--accent);color:var(--onaccent);display:grid;place-items:center;font-size:13px;font-weight:700;flex:none;margin-top:8px}
+.steps .b{flex:1;display:flex;flex-direction:column;gap:4px}
+.steps .b input,.steps .b textarea{padding:8px;font-size:15px;min-height:0}
+.steps .ctl{display:flex;flex-direction:column}
+.steps .ctl button{background:none;border:none;color:var(--muted);font-size:16px;width:30px;height:26px}
+.saved .it{display:flex;gap:6px;align-items:center;padding:8px 0;border-bottom:1px solid var(--line)}
+.saved .it span{flex:1}
+.saved .it small{display:block;color:var(--muted)}
+details{border-bottom:1px solid var(--line);padding:10px 0}
+details summary{font-weight:600;cursor:pointer}
+details p,details li{color:var(--muted);font-size:14px}
+details b{color:var(--text)}
+.tips p{margin:4px 0;font-size:14px;color:var(--muted)}
+.row2{display:flex;gap:8px;flex-wrap:wrap}
+#kitchen{position:fixed;inset:0;background:var(--bg);z-index:20;overflow:auto;padding:14px 16px 40px;display:none}
+#kitchen.show{display:block}
+#kitchen h2{font-size:22px;margin:4px 0 4px}
+#kitchen .ki{display:flex;gap:12px;align-items:center;padding:14px 4px;border-bottom:1px solid var(--line);font-size:19px}
+#kitchen .ki .w{margin-left:auto;font-weight:700;white-space:nowrap}
+#kitchen .ki.done{opacity:.4;text-decoration:line-through}
+#kitchen .ki .ck{width:26px;height:26px;border-radius:7px;border:2px solid var(--accent);flex:none;display:grid;place-items:center;font-size:16px;color:transparent}
+#kitchen .ki.done .ck{background:var(--accent);color:var(--onaccent)}
+#kitchen .ki .dsc{display:block;font-size:14px;color:var(--muted)}
+#kitchen .kt{display:flex;align-items:center;gap:8px;margin-bottom:10px}
+#kitchen .kt .sp{flex:1}
+.timer{font-variant-numeric:tabular-nums;font-size:13px;color:var(--accent2)}
+#toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%);background:var(--text);color:var(--bg);padding:9px 16px;border-radius:20px;font-size:14px;opacity:0;transition:opacity .25s;pointer-events:none;z-index:30}
+#toast.show{opacity:1}
+dialog{background:var(--card);color:var(--text);border:1px solid var(--line);border-radius:14px;width:min(92vw,420px)}
+dialog::backdrop{background:#0008}
+</style>
+</head>
+<body>
+<header>
+  <div class="logo">🍞</div>
+  <h1 data-t="appName">Sourdough Calculator<small data-t="tagline">Perfect bread every time</small></h1>
+  <button class="hbtn" id="unitBtn">g</button>
+  <button class="hbtn" id="awakeBtn" title="Keep screen on">☀︎</button>
+  <button class="hbtn" id="themeBtn">◐</button>
+</header>
+<main>
+
+<section class="card">
+  <h2>🧮 <span data-t="calculator">Bread Calculator</span><span class="sp"></span>
+    <button class="btn sm" id="resetBtn" data-t="reset">Reset</button>
+    <button class="btn sm p" id="shareBtn" data-t="share">Share</button></h2>
+
+  <label class="l" data-t="breadStyle">Bread Style</label>
+  <div class="seg c2" id="styleSeg"></div>
+
+  <label class="l" data-t="calcMode">Calculation Mode</label>
+  <div class="seg c2" id="modeSeg"></div>
+
+  <label class="l" id="weightLbl"></label>
+  <input type="number" id="weight" inputmode="decimal" min="0">
+  <div class="hint" id="weightHint"></div>
+
+  <label class="l" data-t="loaves">Recipe Scale (Number of Loaves)</label>
+  <input type="number" id="loaves" inputmode="numeric" min="1" step="1">
+
+  <div id="sliders"></div>
+
+  <div id="enriched" style="display:none">
+    <label class="l" data-t="enrichedIng">Enriched ingredients (per loaf)</label>
+    <div class="grid3">
+      <div><label id="butterLbl"></label><input type="number" id="butter" inputmode="decimal" min="0"></div>
+      <div><label data-t="eggsCount">Eggs (count)</label><input type="number" id="eggs" inputmode="numeric" min="0" step="1"></div>
+      <div><label id="sugarLbl"></label><input type="number" id="sugar" inputmode="decimal" min="0"></div>
+    </div>
+    <div class="hint" data-t="eggHint">One egg is counted as 50 g.</div>
+  </div>
+
+  <label class="l"><span data-t="doughBlend">Dough Flour Blend</span> <span class="tot" id="doughTot"></span></label>
+  <div class="blend" id="doughBlend"></div>
+  <button class="lnk" id="addDough" data-t="addFlour">+ Add Flour Type</button>
+
+  <label class="l"><span data-t="starterBlend">Starter Flour Mix</span> <span class="tot" id="starterTot"></span></label>
+  <div class="blend" id="starterBlend"></div>
+  <div class="row2">
+    <button class="lnk" style="flex:1" id="addStarter" data-t="addStarterFlour">+ Add Starter Flour</button>
+    <button class="lnk" style="flex:1" id="copyBlend" data-t="copyBlend">Copy Dough Blend</button>
+  </div>
+</section>
+
+<section class="card">
+  <h2>📋 <span data-t="ingredients">Ingredients</span></h2>
+  <div class="summ" id="summ"></div>
+  <div id="results"></div>
+  <button class="btn p" style="width:100%;margin-top:14px" id="kitchenBtn" data-t="enterKitchen">Enter Kitchen Mode</button>
+</section>
+
+<section class="card">
+  <h2>📝 <span data-t="notes">Recipe Notes &amp; Tips</span></h2>
+  <textarea id="notes" data-tp="notesPh"></textarea>
+</section>
+
+<section class="card steps">
+  <h2>👣 <span data-t="steps">Recipe Steps</span> <span id="stepCount" style="color:var(--muted);font-weight:400"></span></h2>
+  <div id="stepList"></div>
+  <div class="row2"><button class="btn" style="flex:1" id="defaultSteps" data-t="defaultSteps">Use template</button>
+    <button class="btn p" style="flex:1" id="addStep" data-t="addStep">Add Step</button></div>
+</section>
+
+<section class="card saved">
+  <h2>💾 <span data-t="saved">Saved Recipes</span><span class="sp"></span>
+    <button class="btn sm p" id="saveBtn" data-t="saveCurrent">Save current</button></h2>
+  <div id="savedList"></div>
+</section>
+
+<section class="card tips">
+  <h2>💡 <span data-t="quickTips">Quick Tips</span></h2>
+  <p data-t="tip1">New to sourdough? Start around 65% hydration.</p>
+  <p data-t="tip2">Starter test: a spoonful should float in water when it's ready.</p>
+</section>
+
+<section class="card" id="learn">
+  <h2>📚 <span data-t="learning">Learning Centre</span></h2>
+  <div id="learnBody"></div>
+</section>
+</main>
+
+<div id="kitchen"></div>
+<div id="toast"></div>
+<dialog id="dlg"><form method="dialog">
+  <p id="dlgMsg" style="margin-top:0"></p>
+  <input type="text" id="dlgInput">
+  <div class="row2" style="justify-content:flex-end;margin-top:12px">
+    <button class="btn" value="cancel" data-t="cancel">Cancel</button>
+    <button class="btn p" value="ok" data-t="ok">OK</button>
+  </div>
+</form></dialog>
+
+<script>
+"use strict";
+/* ---------- i18n ---------- */
+const SV = (navigator.language||'').toLowerCase().startsWith('sv');
+const T = {
+ en:{appName:"Sourdough Calculator",tagline:"Perfect bread every time",calculator:"Bread Calculator",reset:"Reset",share:"Share",
+  breadStyle:"Bread Style",calcMode:"Calculation Mode",modeDough:"Target Dough Weight",modeFlour:"Total Flour Weight",
+  weightDough:"Target Dough Weight (per loaf)",weightFlour:"Total Flour Weight (per loaf, incl. starter)",
+  loaves:"Recipe Scale (Number of Loaves)",perLoaf:n=>`1 loaf = ${n} total`,
+  sourdough:"Sourdough",focaccia:"Focaccia",pizza:"Pizza",enriched:"Enriched",
+  hydration:"Dough Hydration",starterPct:"Starter Percentage",starterHyd:"Starter Hydration",salt:"Salt Percentage",oilPct:"Olive Oil",
+  enrichedIng:"Enriched ingredients (per loaf)",butterU:u=>`Butter (${u})`,eggsCount:"Eggs (count)",sugarU:u=>`Sugar (${u})`,eggHint:"One egg is counted as 50 g.",
+  doughBlend:"Dough Flour Blend",starterBlend:"Starter Flour Mix",addFlour:"+ Add Flour Type",addStarterFlour:"+ Add Starter Flour",copyBlend:"Copy Dough Blend",
+  ingredients:"Ingredients",toAdd:"INGREDIENTS TO ADD",totalFlourAdd:"Total flour to add",waterAdd:"Water to add",starter:"Sourdough starter",
+  starterHas:(w,f,h)=>`Contains ${w} water and ${f} flour (${h}% hydration)`,saltI:"Salt",oil:"Olive oil",butter:"Butter",eggs:"Eggs",sugar:"Sugar",
+  eggN:(n,w)=>`${n} ${n==1?'egg':'eggs'} (${w})`,
+  summary:"SUMMARY",totalFlour:"Total flour (incl. starter)",totalWater:"Total water (incl. starter)",totalWeight:"Total weight",
+  bakers:"BAKER'S PERCENTAGES",flour:"Flour",doughWater:"Water (hydration)",
+  style:"Style",enterKitchen:"Enter Kitchen Mode",notes:"Recipe Notes & Tips",notesPh:"Your notes: timings, temperatures, how it turned out…",
+  steps:"Recipe Steps",addStep:"Add Step",defaultSteps:"Use template",stepTitle:"Step",stepDesc:"Details (optional)",stepMin:"min",
+  saved:"Saved Recipes",saveCurrent:"Save current",noSaved:"No saved recipes yet.",load:"Load",del:"Delete",recipeName:"Recipe name",
+  savedOk:"Recipe saved",loadedOk:"Recipe loaded",deleteQ:n=>`Delete “${n}”?`,overwriteQ:n=>`Replace the saved recipe “${n}”?`,
+  quickTips:"Quick Tips",tip1:"New to sourdough? Start around 65% hydration.",tip2:"Starter test: a spoonful should float in water when it's ready.",
+  learning:"Learning Centre",cancel:"Cancel",ok:"OK",kitchen:"Kitchen Mode",exit:"Exit",check:"Tap to tick off",
+  blendWarn:"Flour blend doesn't add up to 100% — amounts are scaled to fit.",negWater:"The starter holds more water than the dough needs. Lower the starter percentage or starter hydration.",
+  tooHeavy:"The extras weigh more than the target dough. Increase the dough weight.",resetQ:"Reset all settings for this style?",copied:"Copied",
+  awakeOn:"Screen stays on",awakeOff:"Screen can sleep",
+  flours:{bread:"Bread Flour",ap:"All-Purpose Flour",tipo00:"00 Flour (Tipo 00)",ww:"Whole Wheat Flour",rye:"Rye Flour",spelt:"Spelt Flour",einkorn:"Einkorn Flour"},
+  msg:{
+   hydration:[[60,"Playing it safe! 🛡️"],[65,"Nice and manageable 👍"],[70,"Classic territory 🍞"],[75,"Getting artisanal! ✨"],[80,"Easy there, tiger! 🐅"],[85,"Bold move! 💪"],[90,"Sticky situation ahead! 🫣"],[95,"You're brave! 🦁"],[999,"Absolute madness! 🤯"]],
+   starter:[[12,"Patience, grasshopper! 🧘"],[15,"Slow and steady 🐌"],[18,"Taking your time 🕐"],[22,"Sweet spot! 🎯"],[25,"Speeding things up! ⚡"],[28,"Need bread fast? 🏃"],[999,"Turbo mode activated! 🚀"]],
+   starterHyd:[[60,"Stiff starter territory! 💪"],[80,"Getting thicker 🥄"],[100,"Classic 1:1:1 ratio! 👌"],[120,"Nice and loose 🌊"],[150,"Liquid starter vibes! 💧"],[180,"Very liquidy! 🏊"],[999,"Starter soup! 🍲"]],
+   salt:[[1.5,"Keeping it mild 😌"],[1.8,"Light and gentle 🌸"],[2.0,"Classic balance ⚖️"],[2.2,"Traditional territory 👨‍🍳"],[2.5,"Flavor boost! 🎵"],[2.8,"Bold and savory! 💪"],[999,"Salt lover detected! 🧂"]],
+   oilFocaccia:[[0,"No oil — unusual for focaccia"],[3.5,"Lean focaccia"],[7.5,"Standard focaccia"],[11.5,"Rich focaccia"],[999,"Very oily"]],
+   oilPizza:[[0,"Neapolitan — no oil"],[2.5,"Light oil"],[3.5,"NY style"],[6.5,"Pan / Roman style"],[999,"Very rich"]]
+  },
+  template:[["Feed the starter","Use it at its peak, usually 4–12 h later."],["Autolyse","Mix flour and most of the water, rest 30–60 min.",45],["Mix","Add starter, salt and the rest of the water. Knead or squeeze until combined."],["Bulk fermentation","3–4 sets of stretch & folds 30 min apart. Done when risen ~50% and airy.",240],["Pre-shape and rest","Shape loosely, rest uncovered.",25],["Final shape","Shape tightly and place seam-up in a floured banneton."],["Cold proof","Cover and refrigerate overnight.",720],["Bake","Preheat to 250 °C with the Dutch oven. 20 min lid on, then 20–25 min lid off at 230 °C.",45],["Cool","Let it cool at least 1 h before slicing.",60]],
+  learn:[
+   ["Baker's Percentages",`<p>Every ingredient is expressed as a percentage of the <b>total flour weight</b>, which is always 100%. A dough with 1000 g flour, 750 g water and 20 g salt is 75% hydration and 2% salt.</p><p>Because everything relates to flour, recipes scale perfectly: change the flour and every other amount follows. This calculator counts the flour and water inside the starter as part of the dough, which is how most bakers express hydration.</p>`],
+   ["Hydration Guide",`<ul><li><b>55–65%</b> – stiff and easy to handle; bagels, sandwich loaves, beginners.</li><li><b>65–72%</b> – the classic range for a first sourdough boule.</li><li><b>72–80%</b> – open, glossy crumb; needs good strength and shaping.</li><li><b>80%+</b> – very slack; focaccia, ciabatta, pan breads.</li></ul><p>Whole wheat, rye and spelt absorb more water than white flour – add 5–10% hydration when you use a lot of them. Fresh Tipo 00 for pizza often feels best around 60–68%.</p>`],
+   ["Bread Style Guide",`<p><b>Sourdough</b> – flour, water, starter and salt. Around 70–78% hydration, 15–25% starter, 2% salt.</p><p><b>Focaccia</b> – high hydration (75–85%) with olive oil in the dough and plenty more in the pan.</p><p><b>Pizza</b> – 60–70% hydration. Neapolitan has no oil; New York and pan styles add 2–6% oil for tenderness and browning.</p><p><b>Enriched</b> – butter, eggs and sugar make a soft, tender crumb (brioche, challah, cinnamon buns). Fat and sugar slow fermentation, so expect a longer rise.</p>`],
+   ["Sourdough Terminology",`<ul><li><b>Starter / levain</b> – the culture of wild yeast and bacteria that raises the bread.</li><li><b>Starter hydration</b> – water as a % of the flour in the starter. 100% means equal weights.</li><li><b>Autolyse</b> – resting flour and water before adding starter and salt.</li><li><b>Bulk fermentation</b> – the first rise of the whole dough.</li><li><b>Stretch &amp; fold</b> – gentle strengthening by pulling the dough up and over itself.</li><li><b>Banneton</b> – proofing basket.</li><li><b>Oven spring</b> – the rapid rise in the first minutes of baking.</li><li><b>Crumb</b> – the inside structure of the loaf.</li></ul>`],
+   ["Basic Timeline",`<ul><li><b>Morning:</b> feed the starter.</li><li><b>Noon:</b> autolyse, then mix in starter and salt.</li><li><b>Afternoon:</b> bulk fermentation with folds, 3–6 h depending on temperature.</li><li><b>Evening:</b> shape and put in the fridge.</li><li><b>Next morning:</b> bake straight from the fridge.</li></ul><p>Warmer dough (26 °C) ferments much faster than cool dough (21 °C). Watch the dough, not the clock.</p>`]
+  ]},
+ sv:{appName:"Surdegskalkylator",tagline:"Perfekt bröd varje gång",calculator:"Brödkalkylator",reset:"Återställ",share:"Dela",
+  breadStyle:"Brödtyp",calcMode:"Beräkningssätt",modeDough:"Önskad degvikt",modeFlour:"Total mjölvikt",
+  weightDough:"Önskad degvikt (per bröd)",weightFlour:"Total mjölvikt (per bröd, inkl. surdeg)",
+  loaves:"Antal bröd",perLoaf:n=>`1 bröd = ${n} totalt`,
+  sourdough:"Surdegsbröd",focaccia:"Focaccia",pizza:"Pizza",enriched:"Berikat bröd",
+  hydration:"Degens vattenhalt",starterPct:"Andel surdeg",starterHyd:"Surdegens vattenhalt",salt:"Salt",oilPct:"Olivolja",
+  enrichedIng:"Berikning (per bröd)",butterU:u=>`Smör (${u})`,eggsCount:"Ägg (antal)",sugarU:u=>`Socker (${u})`,eggHint:"Ett ägg räknas som 50 g.",
+  doughBlend:"Mjölblandning i degen",starterBlend:"Mjöl i surdegen",addFlour:"+ Lägg till mjölsort",addStarterFlour:"+ Lägg till mjölsort",copyBlend:"Kopiera degens blandning",
+  ingredients:"Ingredienser",toAdd:"ATT TILLSÄTTA",totalFlourAdd:"Totalt mjöl att tillsätta",waterAdd:"Vatten att tillsätta",starter:"Surdeg",
+  starterHas:(w,f,h)=>`Innehåller ${w} vatten och ${f} mjöl (${h}% vattenhalt)`,saltI:"Salt",oil:"Olivolja",butter:"Smör",eggs:"Ägg",sugar:"Socker",
+  eggN:(n,w)=>`${n} ägg (${w})`,
+  summary:"SAMMANSTÄLLNING",totalFlour:"Totalt mjöl (inkl. surdeg)",totalWater:"Totalt vatten (inkl. surdeg)",totalWeight:"Total vikt",
+  bakers:"BAGARPROCENT",flour:"Mjöl",doughWater:"Vatten (vattenhalt)",
+  style:"Typ",enterKitchen:"Starta bakläge",notes:"Anteckningar & tips",notesPh:"Dina anteckningar: tider, temperaturer, hur det blev…",
+  steps:"Receptsteg",addStep:"Lägg till steg",defaultSteps:"Använd mall",stepTitle:"Steg",stepDesc:"Beskrivning (valfri)",stepMin:"min",
+  saved:"Sparade recept",saveCurrent:"Spara nuvarande",noSaved:"Inga sparade recept ännu.",load:"Öppna",del:"Ta bort",recipeName:"Receptets namn",
+  savedOk:"Receptet sparat",loadedOk:"Receptet öppnat",deleteQ:n=>`Ta bort ”${n}”?`,overwriteQ:n=>`Ersätta det sparade receptet ”${n}”?`,
+  quickTips:"Snabba tips",tip1:"Ny på surdeg? Börja runt 65 % vattenhalt.",tip2:"Surdegstest: en sked surdeg ska flyta i vatten när den är redo.",
+  learning:"Lär dig mer",cancel:"Avbryt",ok:"OK",kitchen:"Bakläge",exit:"Stäng",check:"Tryck för att bocka av",
+  blendWarn:"Mjölblandningen blir inte 100 % – mängderna skalas om.",negWater:"Surdegen innehåller mer vatten än degen behöver. Sänk andelen surdeg eller surdegens vattenhalt.",
+  tooHeavy:"Berikningen väger mer än degen. Öka degvikten.",resetQ:"Återställa alla inställningar för den här brödtypen?",copied:"Kopierat",
+  awakeOn:"Skärmen hålls tänd",awakeOff:"Skärmen kan släckas",
+  flours:{bread:"Vetemjöl special",ap:"Vetemjöl",tipo00:"Tipo 00-mjöl",ww:"Fullkornsvete",rye:"Rågmjöl",spelt:"Dinkelmjöl",einkorn:"Enkornsmjöl"},
+  msg:{
+   hydration:[[60,"Säkra kort! 🛡️"],[65,"Lätthanterligt 👍"],[70,"Klassiskt 🍞"],[75,"Hantverksnivå! ✨"],[80,"Lugna ner dig nu! 🐅"],[85,"Modigt drag! 💪"],[90,"Det blir kladdigt! 🫣"],[95,"Du är tapper! 🦁"],[999,"Rena galenskapen! 🤯"]],
+   starter:[[12,"Tålamod! 🧘"],[15,"Sakta men säkert 🐌"],[18,"Tar god tid på dig 🕐"],[22,"Helt rätt! 🎯"],[25,"Det går undan! ⚡"],[28,"Bråttom med brödet? 🏃"],[999,"Turboläge! 🚀"]],
+   starterHyd:[[60,"Fast surdeg! 💪"],[80,"Lite tjockare 🥄"],[100,"Klassiskt 1:1:1! 👌"],[120,"Lös och fin 🌊"],[150,"Flytande surdeg! 💧"],[180,"Väldigt rinnig! 🏊"],[999,"Surdegssoppa! 🍲"]],
+   salt:[[1.5,"Milt 😌"],[1.8,"Lätt och skonsamt 🌸"],[2.0,"Klassisk balans ⚖️"],[2.2,"Traditionellt 👨‍🍳"],[2.5,"Mer smak! 🎵"],[2.8,"Salt och kraftigt! 💪"],[999,"Saltälskare! 🧂"]],
+   oilFocaccia:[[0,"Ingen olja – ovanligt för focaccia"],[3.5,"Mager focaccia"],[7.5,"Vanlig focaccia"],[11.5,"Fyllig focaccia"],[999,"Väldigt oljig"]],
+   oilPizza:[[0,"Napolitansk – ingen olja"],[2.5,"Lite olja"],[3.5,"New York-stil"],[6.5,"Pann- / romersk stil"],[999,"Väldigt fyllig"]]
+  },
+  template:[["Mata surdegen","Använd den när den toppar, oftast 4–12 h senare."],["Autolys","Blanda mjöl och det mesta av vattnet, vila 30–60 min.",45],["Blanda","Tillsätt surdeg, salt och resten av vattnet. Knåda eller kläm tills allt är blandat."],["Jäsning i bunke","3–4 omgångar sträck & vik med 30 min mellanrum. Klar när degen ökat ~50 % och är luftig.",240],["Förforma och vila","Forma löst och låt vila utan täcke.",25],["Slutforma","Forma stramt och lägg med skarven upp i en mjölad jäskorg."],["Kalljäsning","Täck och ställ i kylen över natten.",720],["Grädda","Förvärm till 250 °C med gjutjärnsgryta. 20 min med lock, sedan 20–25 min utan lock på 230 °C.",45],["Låt svalna","Vänta minst 1 h innan du skär.",60]],
+  learn:[
+   ["Bagarprocent",`<p>Varje ingrediens anges i procent av den <b>totala mjölvikten</b>, som alltid är 100 %. En deg med 1000 g mjöl, 750 g vatten och 20 g salt har 75 % vattenhalt och 2 % salt.</p><p>Eftersom allt utgår från mjölet skalas recept perfekt. Kalkylatorn räknar mjölet och vattnet i surdegen som en del av degen, vilket är det vanligaste sättet att ange vattenhalt.</p>`],
+   ["Vattenhalt",`<ul><li><b>55–65 %</b> – fast och lätthanterlig; bagels, formbröd, nybörjare.</li><li><b>65–72 %</b> – det klassiska spannet för ett första surdegsbröd.</li><li><b>72–80 %</b> – öppen, glansig inkråm; kräver bra glutenstyrka och formning.</li><li><b>80 %+</b> – mycket lös; focaccia, ciabatta, plåtbröd.</li></ul><p>Fullkorn, råg och dinkel suger upp mer vatten än vitt vetemjöl – lägg till 5–10 % när du använder mycket av dem. Tipo 00 till pizza fungerar ofta bäst runt 60–68 %.</p>`],
+   ["Brödtyper",`<p><b>Surdegsbröd</b> – mjöl, vatten, surdeg och salt. Runt 70–78 % vattenhalt, 15–25 % surdeg, 2 % salt.</p><p><b>Focaccia</b> – hög vattenhalt (75–85 %) med olivolja i degen och ännu mer i formen.</p><p><b>Pizza</b> – 60–70 % vattenhalt. Napolitansk har ingen olja; New York- och pannpizza har 2–6 % olja för mörhet och färg.</p><p><b>Berikat bröd</b> – smör, ägg och socker ger en mjuk och mör inkråm (brioche, challah, kanelbullar). Fett och socker bromsar jäsningen, så räkna med längre jästid.</p>`],
+   ["Surdegsord",`<ul><li><b>Surdeg / levain</b> – kulturen av vildjäst och bakterier som får brödet att jäsa.</li><li><b>Surdegens vattenhalt</b> – vatten i procent av surdegens mjöl. 100 % betyder lika vikt.</li><li><b>Autolys</b> – mjöl och vatten får vila innan surdeg och salt tillsätts.</li><li><b>Bulkjäsning</b> – första jäsningen av hela degen.</li><li><b>Sträck &amp; vik</b> – degen stärks varsamt genom att dras upp och vikas över sig själv.</li><li><b>Jäskorg / banneton</b> – korg för slutjäsning.</li><li><b>Ugnsresning</b> – den snabba höjningen under de första minuterna i ugnen.</li><li><b>Inkråm</b> – brödets inre struktur.</li></ul>`],
+   ["Grundschema",`<ul><li><b>Morgon:</b> mata surdegen.</li><li><b>Lunch:</b> autolys, blanda sedan i surdeg och salt.</li><li><b>Eftermiddag:</b> bulkjäsning med vikningar, 3–6 h beroende på temperatur.</li><li><b>Kväll:</b> forma och ställ i kylen.</li><li><b>Nästa morgon:</b> grädda direkt från kylen.</li></ul><p>Varm deg (26 °C) jäser mycket snabbare än sval deg (21 °C). Titta på degen, inte klockan.</p>`]
+  ]}
+};
+const L = SV ? T.sv : T.en;
+document.documentElement.lang = SV ? 'sv' : 'en';
+
+/* ---------- state ---------- */
+const FLOURS = ['bread','ap','tipo00','ww','rye','spelt','einkorn'];
+const DEFAULTS = {
+  sourdough:{hydration:75,starter:20,starterHyd:100,salt:2,oil:0},
+  focaccia:{hydration:80,starter:15,starterHyd:100,salt:2,oil:4},
+  pizza:{hydration:65,starter:15,starterHyd:100,salt:2,oil:3},
+  enriched:{hydration:65,starter:15,starterHyd:100,salt:1.5,oil:0,butter:60,eggs:1,sugar:30}
+};
+const SLIDERS = {
+  hydration:{min:50,max:100,step:1,chips:[65,70,75,80,85]},
+  starter:{min:10,max:50,step:1,chips:[15,20,25,30]},
+  starterHyd:{min:50,max:200,step:1,chips:[75,100,125,150]},
+  oil:{min:0,max:15,step:0.5,chips:[4,6,8,10]},
+  salt:{min:1,max:3,step:0.1,chips:[1,1.5,2]}
+};
+const OZ = 28.349523125;
+function freshState(style='sourdough'){
+  return Object.assign({style,mode:'dough',weight:1000,flourWeight:550,loaves:1,butter:0,eggs:0,sugar:0,
+    doughBlend:[['bread',100]],starterBlend:[['bread',100]],notes:'',steps:[]},DEFAULTS[style]);
+}
+let S = load('sd_state') || freshState();
+let prefs = Object.assign({unit:'g',theme:'dark',awake:false},load('sd_prefs')||{});
+function load(k){try{return JSON.parse(localStorage.getItem(k))}catch(e){return null}}
+function store(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}}
+const persist = ()=>store('sd_state',S);
+
+/* ---------- helpers ---------- */
+const $ = id=>document.getElementById(id);
+const el = (tag,attrs={},...kids)=>{const e=document.createElement(tag);for(const[k,v]of Object.entries(attrs)){if(k==='on')for(const[ev,f]of Object.entries(v))e.addEventListener(ev,f);else if(k in e&&k!=='list')e[k]=v;else e.setAttribute(k,v)}for(const c of kids)if(c!=null)e.append(c);return e};
+const num = v=>{const n=parseFloat(String(v).replace(',','.'));return isFinite(n)?n:0};
+const pct = v=>(Math.round(v*10)/10).toLocaleString(SV?'sv-SE':'en-US',{minimumFractionDigits:1,maximumFractionDigits:1})+'%';
+function fmtW(g){
+  if(prefs.unit==='oz'){const o=g/OZ;return o.toLocaleString(SV?'sv-SE':'en-US',{maximumFractionDigits:o<10?2:1})+' oz'}
+  const d = Math.abs(g)<30 ? 1 : 0;
+  return (Math.round(g*10**d)/10**d).toLocaleString(SV?'sv-SE':'en-US',{maximumFractionDigits:d})+' g';
+}
+const toUnit = g=>prefs.unit==='oz'?+(g/OZ).toFixed(2):Math.round(g*10)/10;
+const fromUnit = v=>prefs.unit==='oz'?num(v)*OZ:num(v);
+function msgFor(list,v){for(const[lim,m]of list)if(v<=lim+1e-9)return m;return ''}
+function toast(t){const e=$('toast');e.textContent=t;e.classList.add('show');clearTimeout(toast.t);toast.t=setTimeout(()=>e.classList.remove('show'),1600)}
+const native = window.Android;
+function ask(msg,withInput,def=''){
+  return new Promise(res=>{const d=$('dlg');$('dlgMsg').textContent=msg;const i=$('dlgInput');i.style.display=withInput?'':'none';i.value=def;
+    d.returnValue='';d.onclose=()=>res(d.returnValue==='ok'?(withInput?i.value.trim():true):null);d.showModal();if(withInput)setTimeout(()=>i.focus(),50)});
+}
+
+/* ---------- calculation ---------- */
+function normBlend(b){const tot=b.reduce((a,[,p])=>a+num(p),0);return {tot,parts:tot>0?b.map(([f,p])=>[f,num(p)/tot]):[['bread',1]]}}
+function calc(){
+  const n=Math.max(1,Math.round(num(S.loaves))||1);
+  const h=S.hydration/100, s=S.starter/100, sh=S.starterHyd/100, salt=S.salt/100;
+  const oil=(S.style==='focaccia'||S.style==='pizza')?S.oil/100:0;
+  const enr=S.style==='enriched';
+  const butter=enr?num(S.butter):0, eggs=enr?Math.max(0,Math.round(num(S.eggs))):0, sugar=enr?num(S.sugar):0;
+  const eggW=eggs*50, extras=butter+eggW+sugar;
+  let F = S.mode==='dough' ? (num(S.weight)-extras)/(1+h+salt+oil) : num(S.flourWeight);
+  const tooHeavy = S.mode==='dough' && F<=0;
+  F=Math.max(0,F)*n;
+  const starter=F*s, sFlour=starter/(1+sh), sWater=starter-sFlour;
+  const flourAdd=F-sFlour, water=F*h, waterAdd=water-sWater;
+  const r={n,F,starter,sFlour,sWater,flourAdd,water,waterAdd,salt:F*salt,oil:F*oil,butter:butter*n,eggs:eggs*n,eggW:eggW*n,sugar:sugar*n,tooHeavy};
+  r.total=F+water+r.salt+r.oil+r.butter+r.eggW+r.sugar;
+  r.dough=normBlend(S.doughBlend); r.starterB=normBlend(S.starterBlend);
+  // flour breakdown to add = dough blend of total flour minus starter's flour per type
+  const want={},have={};
+  for(const[f,p]of r.dough.parts)want[f]=(want[f]||0)+p*F;
+  for(const[f,p]of r.starterB.parts)have[f]=(have[f]||0)+p*sFlour;
+  // if starter flour types can't be subtracted (not in dough blend), just apply dough blend to flour-to-add
+  const ok=Object.keys(have).every(f=>(want[f]||0)>=have[f]-1e-6);
+  r.flourLines = ok ? Object.keys(want).map(f=>[f,want[f]-(have[f]||0)]).filter(([,g])=>g>0.05)
+                    : r.dough.parts.map(([f,p])=>[f,p*flourAdd]);
+  return r;
+}
+
+/* ---------- render: controls ---------- */
+function applyI18n(){
+  document.querySelectorAll('[data-t]').forEach(e=>{const v=L[e.dataset.t];if(typeof v==='string'){if(e.dataset.t==='appName'){e.firstChild.textContent=v}else e.textContent=v}});
+  document.querySelectorAll('[data-tp]').forEach(e=>e.placeholder=L[e.dataset.tp]);
+  document.title=L.appName;
+}
+function renderSeg(){
+  const ss=$('styleSeg');ss.innerHTML='';
+  const icons={sourdough:'🥖',focaccia:'🫒',pizza:'🍕',enriched:'🥐'};
+  for(const st of Object.keys(DEFAULTS))ss.append(el('button',{className:S.style===st?'on':'',textContent:icons[st]+' '+L[st],on:{click:()=>setStyle(st)}}));
+  const ms=$('modeSeg');ms.innerHTML='';
+  for(const[m,k]of[['dough','modeDough'],['flour','modeFlour']])ms.append(el('button',{className:S.mode===m?'on':'',textContent:L[k],on:{click:()=>{S.mode=m;renderAll()}}}));
+}
+function setStyle(st){
+  if(st===S.style)return;
+  const keep={mode:S.mode,weight:S.weight,flourWeight:S.flourWeight,loaves:S.loaves,doughBlend:S.doughBlend,starterBlend:S.starterBlend,notes:S.notes,steps:S.steps};
+  S=Object.assign(freshState(st),keep);renderAll();
+}
+function renderWeight(){
+  const u=prefs.unit;
+  $('weightLbl').textContent=(S.mode==='dough'?L.weightDough:L.weightFlour)+` (${u})`;
+  $('weight').value=toUnit(S.mode==='dough'?S.weight:S.flourWeight);
+  $('weight').step=u==='oz'?'0.1':'10';
+  $('loaves').value=S.loaves;
+  $('butterLbl').textContent=L.butterU(u);$('sugarLbl').textContent=L.sugarU(u);
+  $('butter').value=toUnit(S.butter);$('eggs').value=S.eggs;$('sugar').value=toUnit(S.sugar);
+  $('enriched').style.display=S.style==='enriched'?'':'none';
+}
+function sliderMsgs(key){
+  if(key==='oil')return S.style==='pizza'?L.msg.oilPizza:L.msg.oilFocaccia;
+  return L.msg[key];
+}
+function renderSliders(){
+  const box=$('sliders');box.innerHTML='';
+  const keys=['hydration','starter','starterHyd'];
+  if(S.style==='focaccia'||S.style==='pizza')keys.push('oil');
+  keys.push('salt');
+  const labels={hydration:L.hydration,starter:L.starterPct,starterHyd:L.starterHyd,oil:L.oilPct,salt:L.salt};
+  for(const k of keys){
+    const cfg=Object.assign({},SLIDERS[k]);
+    if(k==='oil'&&S.style==='pizza'){cfg.max=10;cfg.chips=[0,2,3,5]}
+    const valEl=el('div',{className:'sv'});
+    const range=el('input',{type:'range',min:cfg.min,max:cfg.max,step:cfg.step,value:S[k]});
+    const chips=el('div',{className:'chips'});
+    const set=v=>{v=Math.min(cfg.max,Math.max(cfg.min,Math.round(v/cfg.step)*cfg.step));v=+v.toFixed(1);S[k]=v;range.value=v;upd();renderResults()};
+    const upd=()=>{valEl.innerHTML='';valEl.append(pct(S[k]),el('small',{textContent:msgFor(sliderMsgs(k),S[k])}));
+      [...chips.children].forEach(c=>c.classList.toggle('on',+c.dataset.v===S[k]))};
+    for(const c of cfg.chips)chips.append(el('button',{textContent:c+'%','data-v':c,on:{click:()=>set(c)}}));
+    range.addEventListener('input',()=>set(+range.value));
+    box.append(el('label',{className:'l',textContent:labels[k]}),chips,
+      el('div',{className:'slider'},el('button',{textContent:'−',on:{click:()=>set(S[k]-cfg.step)}}),range,el('button',{textContent:'+',on:{click:()=>set(S[k]+cfg.step)}})),
+      el('div',{className:'mm'},el('span',{textContent:cfg.min+'%'}),el('span',{textContent:cfg.max+'%'})),valEl);
+    upd();
+  }
+}
+function renderBlend(key,boxId,totId){
+  const box=$(boxId);box.innerHTML='';
+  const b=S[key];
+  b.forEach((row,i)=>{
+    const sel=el('select',{on:{change:e=>{row[0]=e.target.value;renderResults()}}});
+    for(const f of FLOURS)sel.append(el('option',{value:f,textContent:L.flours[f],selected:f===row[0]}));
+    const inp=el('input',{type:'number',inputmode:'decimal',min:0,max:100,value:row[1],on:{input:e=>{row[1]=num(e.target.value);updTot();renderResults()}}});
+    box.append(el('div',{className:'row'},sel,inp,el('span',{textContent:'%'}),
+      b.length>1?el('button',{className:'x',textContent:'×',on:{click:()=>{b.splice(i,1);rebalance(b);renderBlend(key,boxId,totId);renderResults()}}}):el('span',{style:'width:30px'})));
+  });
+  const updTot=()=>{const t=b.reduce((a,[,p])=>a+num(p),0);const e=$(totId);e.textContent=pct(t);e.className='tot '+(Math.abs(t-100)<0.05?'ok':'bad')};
+  updTot();
+}
+function rebalance(b){const t=b.reduce((a,[,p])=>a+num(p),0);if(t>0&&b.length)b[b.length-1][1]=+Math.max(0,num(b[b.length-1][1])+100-t).toFixed(1)}
+function addFlour(key){
+  const b=S[key];const used=new Set(b.map(r=>r[0]));const f=FLOURS.find(x=>!used.has(x))||'bread';
+  const take=Math.min(20,num(b[0][1]));b[0][1]=+(num(b[0][1])-take).toFixed(1);b.push([f,take]);
+}
+
+/* ---------- render: results ---------- */
+function renderResults(){
+  persist();
+  const r=calc(), box=$('results');box.innerHTML='';
+  $('weightHint').textContent=S.mode==='dough'?L.perLoaf(fmtW(num(S.weight))):L.perLoaf(fmtW(r.n?r.total/r.n:0));
+  $('summ').innerHTML='';
+  for(const[k,v]of[[L.style,L[S.style]],[L.hydration,pct(S.hydration)],[L.starterPct,pct(S.starter)],[L.starterHyd,pct(S.starterHyd)],[L.salt,pct(S.salt)]].concat(r.oil?[[L.oilPct,pct(S.oil)]]:[]))
+    $('summ').append(el('div',{},k+': ',el('b',{textContent:v})));
+  const t=el('table');
+  const row=(a,b,cls)=>t.append(el('tr',{className:cls||''},el('td',{textContent:a}),el('td',{textContent:b})));
+  const sec=s=>t.append(el('tr',{},el('td',{colSpan:2,className:'sec',textContent:s})));
+  sec(L.toAdd);
+  for(const[f,g]of r.flourLines)row(L.flours[f],fmtW(g));
+  if(r.flourLines.length>1)row(L.totalFlourAdd,fmtW(r.flourAdd),'tot');
+  row(L.waterAdd,fmtW(r.waterAdd));
+  row(L.starter,fmtW(r.starter));
+  row(L.starterHas(fmtW(r.sWater),fmtW(r.sFlour),S.starterHyd),'','sub');
+  if(r.starterB.parts.length>1)for(const[f,p]of r.starterB.parts)row('· '+L.flours[f],fmtW(p*r.sFlour),'sub');
+  row(L.saltI,fmtW(r.salt));
+  if(r.oil)row(L.oil,fmtW(r.oil));
+  if(S.style==='enriched'){if(r.butter)row(L.butter,fmtW(r.butter));if(r.eggs)row(L.eggs,L.eggN(r.eggs,fmtW(r.eggW)));if(r.sugar)row(L.sugar,fmtW(r.sugar))}
+  sec(L.summary);
+  row(L.totalFlour,fmtW(r.F));row(L.totalWater,fmtW(r.water));row(L.saltI,fmtW(r.salt));
+  row(L.totalWeight,fmtW(r.total),'tot');
+  sec(L.bakers);
+  const bp=x=>r.F>0?pct(x/r.F*100):'–';
+  row(L.flour,pct(100));row(L.doughWater,pct(S.hydration));row(L.starter,pct(S.starter));row(L.saltI,pct(S.salt));
+  if(r.oil)row(L.oil,pct(S.oil));
+  if(S.style==='enriched'){if(r.butter)row(L.butter,bp(r.butter));if(r.eggs)row(L.eggs,bp(r.eggW));if(r.sugar)row(L.sugar,bp(r.sugar))}
+  box.append(t);
+  if(r.tooHeavy)box.append(el('div',{className:'warn',textContent:L.tooHeavy}));
+  if(r.waterAdd<-0.5)box.append(el('div',{className:'warn',textContent:L.negWater}));
+  if(Math.abs(r.dough.tot-100)>0.05||Math.abs(r.starterB.tot-100)>0.05)box.append(el('div',{className:'warn',textContent:L.blendWarn}));
+}
+
+/* ---------- steps ---------- */
+function renderSteps(){
+  const box=$('stepList');box.innerHTML='';$('stepCount').textContent=`(${S.steps.length})`;
+  S.steps.forEach((st,i)=>{
+    const title=el('input',{type:'text',value:st.t||'',placeholder:L.stepTitle+' '+(i+1),on:{input:e=>{st.t=e.target.value;persist()}}});
+    const desc=el('textarea',{value:st.d||'',placeholder:L.stepDesc,rows:2,on:{input:e=>{st.d=e.target.value;persist()}}});
+    const min=el('input',{type:'number',inputmode:'numeric',min:0,value:st.m||'',placeholder:L.stepMin,style:'width:90px',on:{input:e=>{st.m=num(e.target.value)||0;persist()}}});
+    const move=(d)=>{const j=i+d;if(j<0||j>=S.steps.length)return;[S.steps[i],S.steps[j]]=[S.steps[j],S.steps[i]];renderSteps();persist()};
+    box.append(el('div',{className:'st'},el('div',{className:'n',textContent:i+1}),
+      el('div',{className:'b'},title,desc,el('div',{style:'display:flex;align-items:center;gap:6px'},min,el('span',{className:'hint',textContent:L.stepMin}))),
+      el('div',{className:'ctl'},el('button',{textContent:'↑',on:{click:()=>move(-1)}}),el('button',{textContent:'↓',on:{click:()=>move(1)}}),
+        el('button',{textContent:'×',on:{click:()=>{S.steps.splice(i,1);renderSteps();persist()}}}))));
+  });
+}
+
+/* ---------- saved recipes ---------- */
+const getSaved=()=>load('sd_saved')||[];
+function renderSaved(){
+  const box=$('savedList');box.innerHTML='';const list=getSaved();
+  if(!list.length){box.append(el('div',{className:'hint',textContent:L.noSaved}));return}
+  list.forEach((rec,i)=>{
+    const s=rec.state;
+    box.append(el('div',{className:'it'},el('span',{},rec.name,el('small',{textContent:`${L[s.style]} · ${pct(s.hydration)} · ${new Date(rec.date).toLocaleDateString(SV?'sv-SE':undefined)}`})),
+      el('button',{className:'btn sm p',textContent:L.load,on:{click:()=>{S=Object.assign(freshState(s.style),JSON.parse(JSON.stringify(s)));renderAll();toast(L.loadedOk);window.scrollTo({top:0,behavior:'smooth'})}}}),
+      el('button',{className:'btn sm',textContent:L.del,on:{click:async()=>{if(await ask(L.deleteQ(rec.name))){const l=getSaved();l.splice(i,1);store('sd_saved',l);renderSaved()}}}})));
+  });
+}
+async function saveCurrent(){
+  const name=await ask(L.recipeName,true,L[S.style]+' '+pct(S.hydration));if(!name)return;
+  const l=getSaved();const ex=l.findIndex(r=>r.name===name);
+  const rec={name,date:Date.now(),state:JSON.parse(JSON.stringify(S))};
+  if(ex>=0){if(!await ask(L.overwriteQ(name)))return;l[ex]=rec}else l.unshift(rec);
+  store('sd_saved',l);renderSaved();toast(L.savedOk);
+}
+
+/* ---------- text export / share ---------- */
+function recipeText(){
+  const r=calc();const lines=[`${L.appName} – ${L[S.style]}`,''];
+  lines.push(`${L.hydration}: ${pct(S.hydration)} · ${L.starterPct}: ${pct(S.starter)} · ${L.starterHyd}: ${pct(S.starterHyd)} · ${L.salt}: ${pct(S.salt)}`+(r.oil?` · ${L.oilPct}: ${pct(S.oil)}`:''));
+  lines.push('',L.ingredients+':');
+  for(const[f,g]of r.flourLines)lines.push(`• ${L.flours[f]}: ${fmtW(g)}`);
+  lines.push(`• ${L.waterAdd}: ${fmtW(r.waterAdd)}`,`• ${L.starter}: ${fmtW(r.starter)}`,`• ${L.saltI}: ${fmtW(r.salt)}`);
+  if(r.oil)lines.push(`• ${L.oil}: ${fmtW(r.oil)}`);
+  if(S.style==='enriched'){if(r.butter)lines.push(`• ${L.butter}: ${fmtW(r.butter)}`);if(r.eggs)lines.push(`• ${L.eggs}: ${L.eggN(r.eggs,fmtW(r.eggW))}`);if(r.sugar)lines.push(`• ${L.sugar}: ${fmtW(r.sugar)}`)}
+  lines.push('',`${L.totalFlour}: ${fmtW(r.F)}`,`${L.totalWater}: ${fmtW(r.water)}`,`${L.totalWeight}: ${fmtW(r.total)}`+(r.n>1?` (${r.n} × ${fmtW(r.total/r.n)})`:''));
+  if(S.steps.length){lines.push('',L.steps+':');S.steps.forEach((s,i)=>lines.push(`${i+1}. ${s.t||L.stepTitle+' '+(i+1)}${s.m?` (${s.m} ${L.stepMin})`:''}${s.d?' – '+s.d:''}`))}
+  if(S.notes.trim())lines.push('',L.notes+':',S.notes.trim());
+  return lines.join('\n');
+}
+function share(){
+  const txt=recipeText();
+  if(native&&native.share)native.share(txt,L.appName);
+  else if(navigator.share)navigator.share({text:txt}).catch(()=>{});
+  else navigator.clipboard?.writeText(txt).then(()=>toast(L.copied));
+}
+
+/* ---------- kitchen mode ---------- */
+let timers={};
+function openKitchen(){
+  const r=calc(), k=$('kitchen');k.innerHTML='';k.classList.add('show');history.pushState({k:1},'');
+  setAwake(true,true);
+  k.append(el('div',{className:'kt'},el('h2',{textContent:'👩‍🍳 '+L.kitchen}),el('span',{className:'sp'}),el('button',{className:'btn',textContent:L.exit,on:{click:()=>history.back()}})));
+  k.append(el('div',{className:'hint',textContent:`${L[S.style]} · ${fmtW(r.total)} · ${L.check}`}));
+  const item=(name,w,dsc,mins)=>{
+    const tm=mins?el('span',{className:'timer'}):null;
+    const it=el('div',{className:'ki',on:{click:e=>{if(e.target.closest('button'))return;it.classList.toggle('done')}}},el('span',{className:'ck',textContent:'✓'}),el('span',{},name,dsc?el('span',{className:'dsc',textContent:dsc}):null,tm),w?el('span',{className:'w',textContent:w}):null);
+    if(mins){const b=el('button',{className:'btn sm',textContent:'⏱ '+mins+' '+L.stepMin,on:{click:()=>startTimer(name,mins,tm,b)}});it.append(b)}
+    k.append(it);
+  };
+  k.append(el('div',{className:'sec',textContent:L.ingredients.toUpperCase()}));
+  for(const[f,g]of r.flourLines)item(L.flours[f],fmtW(g));
+  item(L.waterAdd,fmtW(r.waterAdd));
+  item(L.starter,fmtW(r.starter),L.starterHas(fmtW(r.sWater),fmtW(r.sFlour),S.starterHyd));
+  item(L.saltI,fmtW(r.salt));
+  if(r.oil)item(L.oil,fmtW(r.oil));
+  if(S.style==='enriched'){if(r.butter)item(L.butter,fmtW(r.butter));if(r.eggs)item(L.eggs,L.eggN(r.eggs,fmtW(r.eggW)));if(r.sugar)item(L.sugar,fmtW(r.sugar))}
+  if(S.steps.length){k.append(el('div',{className:'sec',textContent:L.steps.toUpperCase()}));
+    S.steps.forEach((s,i)=>item(`${i+1}. ${s.t||L.stepTitle+' '+(i+1)}`,'',s.d,s.m))}
+  if(S.notes.trim())k.append(el('div',{className:'sec',textContent:L.notes.toUpperCase()}),el('p',{style:'white-space:pre-wrap;color:var(--muted)',textContent:S.notes}));
+}
+function startTimer(name,mins,out,btn){
+  if(native&&native.startTimer){native.startTimer(name,mins*60);}
+  clearInterval(timers[name]);const end=Date.now()+mins*60000;btn.style.display='none';
+  const tick=()=>{const s=Math.max(0,Math.round((end-Date.now())/1000));const h=Math.floor(s/3600),m=Math.floor(s/60)%60,ss=s%60;
+    out.textContent=' ⏱ '+(h?h+':'+String(m).padStart(2,'0'):m)+':'+String(ss).padStart(2,'0');if(!s){clearInterval(timers[name]);out.textContent=' ✅'}};
+  tick();timers[name]=setInterval(tick,1000);
+}
+function closeKitchen(){$('kitchen').classList.remove('show');setAwake(prefs.awake,true)}
+window.addEventListener('popstate',()=>{if($('kitchen').classList.contains('show'))closeKitchen()});
+
+/* ---------- prefs ---------- */
+let wakeLock=null;
+async function setAwake(on,silent){
+  if(native&&native.keepAwake)native.keepAwake(!!on);
+  else if('wakeLock' in navigator){try{if(on&&!wakeLock)wakeLock=await navigator.wakeLock.request('screen');else if(!on&&wakeLock){wakeLock.release();wakeLock=null}}catch(e){}}
+  if(!silent)toast(on?L.awakeOn:L.awakeOff);
+}
+function applyPrefs(){
+  document.body.classList.toggle('light',prefs.theme==='light');
+  $('unitBtn').textContent=prefs.unit;$('awakeBtn').classList.toggle('on',prefs.awake);
+  if(native&&native.setDark)native.setDark(prefs.theme!=='light');
+  store('sd_prefs',prefs);
+}
+
+/* ---------- wiring ---------- */
+function renderAll(){applyI18n();renderSeg();renderWeight();renderSliders();renderBlend('doughBlend','doughBlend','doughTot');renderBlend('starterBlend','starterBlend','starterTot');renderResults();renderSteps();$('notes').value=S.notes;renderSaved()}
+$('weight').addEventListener('input',e=>{const g=fromUnit(e.target.value);if(S.mode==='dough')S.weight=g;else S.flourWeight=g;renderResults()});
+$('loaves').addEventListener('input',e=>{S.loaves=Math.max(1,Math.round(num(e.target.value))||1);renderResults()});
+$('butter').addEventListener('input',e=>{S.butter=fromUnit(e.target.value);renderResults()});
+$('sugar').addEventListener('input',e=>{S.sugar=fromUnit(e.target.value);renderResults()});
+$('eggs').addEventListener('input',e=>{S.eggs=Math.max(0,Math.round(num(e.target.value)));renderResults()});
+$('notes').addEventListener('input',e=>{S.notes=e.target.value;persist()});
+$('addDough').onclick=()=>{addFlour('doughBlend');renderBlend('doughBlend','doughBlend','doughTot');renderResults()};
+$('addStarter').onclick=()=>{addFlour('starterBlend');renderBlend('starterBlend','starterBlend','starterTot');renderResults()};
+$('copyBlend').onclick=()=>{S.starterBlend=JSON.parse(JSON.stringify(S.doughBlend));renderBlend('starterBlend','starterBlend','starterTot');renderResults()};
+$('resetBtn').onclick=async()=>{if(await ask(L.resetQ)){const keep={notes:S.notes,steps:S.steps};S=Object.assign(freshState(S.style),keep);renderAll()}};
+$('shareBtn').onclick=share;
+$('kitchenBtn').onclick=openKitchen;
+$('addStep').onclick=()=>{S.steps.push({t:'',d:'',m:0});renderSteps();persist();const ins=$('stepList').querySelectorAll('input[type=text]');ins[ins.length-1]?.focus()};
+$('defaultSteps').onclick=()=>{for(const[t,d,m]of L.template)S.steps.push({t,d,m:m||0});renderSteps();persist()};
+$('saveBtn').onclick=saveCurrent;
+$('unitBtn').onclick=()=>{prefs.unit=prefs.unit==='g'?'oz':'g';applyPrefs();renderWeight();renderResults()};
+$('themeBtn').onclick=()=>{prefs.theme=prefs.theme==='light'?'dark':'light';applyPrefs()};
+$('awakeBtn').onclick=()=>{prefs.awake=!prefs.awake;applyPrefs();setAwake(prefs.awake)};
+for(const[h,body]of L.learn){const d=el('details',{},el('summary',{textContent:h}));const c=el('div');c.innerHTML=body;d.append(c);$('learnBody').append(d)}
+applyPrefs();renderAll();if(prefs.awake)setAwake(true,true);
+</script>
+</body>
+</html>

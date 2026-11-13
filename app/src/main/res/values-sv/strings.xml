@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Surdeg</string>
+    <string name="share_title">Dela recept</string>
+    <string name="no_timer_app">Ingen klockapp hittades för timer</string>
+</resources>
