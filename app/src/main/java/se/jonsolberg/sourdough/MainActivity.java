@@ -3,6 +3,7 @@ package se.jonsolberg.sourdough;
 import android.app.Activity;
 import android.content.ActivityNotFoundException;
 import android.content.Intent;
+import android.content.res.Configuration;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.AlarmClock;
@@ -17,7 +18,7 @@ import android.webkit.WebViewClient;
 import android.widget.Toast;
 
 /**
- * Hosts the bundled, fully offline calculator (assets/index.html) in a WebView.
+ * Hosts the bundled, fully offline Levain bread calculator (assets/index.html) in a WebView.
  * The app has no INTERNET permission; nothing is loaded from the network.
  */
 public class MainActivity extends Activity {
@@ -64,8 +65,20 @@ public class MainActivity extends Activity {
     @Override
     @SuppressWarnings("deprecation")
     public void onBackPressed() {
-        if (web.canGoBack()) web.goBack();   // closes kitchen mode
+        if (web.canGoBack()) web.goBack();   // closes baking mode
         else super.onBackPressed();
+    }
+
+    private boolean systemDark() {
+        return (getResources().getConfiguration().uiMode & Configuration.UI_MODE_NIGHT_MASK)
+                == Configuration.UI_MODE_NIGHT_YES;
+    }
+
+    @Override
+    public void onConfigurationChanged(Configuration newConfig) {
+        super.onConfigurationChanged(newConfig);
+        boolean dark = (newConfig.uiMode & Configuration.UI_MODE_NIGHT_MASK) == Configuration.UI_MODE_NIGHT_YES;
+        web.evaluateJavascript("window.onSystemTheme&&onSystemTheme(" + dark + ")", null);
     }
 
     @Override
@@ -75,7 +88,7 @@ public class MainActivity extends Activity {
     }
 
     private void applyBars(boolean dark) {
-        int color = getColor(dark ? R.color.bg : R.color.bg_light);
+        int color = getColor(dark ? R.color.bg_dark : R.color.bg_light);
         getWindow().setStatusBarColor(color);
         getWindow().setNavigationBarColor(color);
         web.setBackgroundColor(color);
@@ -110,6 +123,11 @@ public class MainActivity extends Activity {
                 if (on) getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
                 else getWindow().clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
             });
+        }
+
+        @JavascriptInterface
+        public boolean isSystemDark() {
+            return systemDark();
         }
 
         @JavascriptInterface

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">Sourdough</string>
+    <string name="app_name">Levain</string>
     <string name="share_title">Share recipe</string>
     <string name="no_timer_app">No clock app found for timers</string>
 </resources>
