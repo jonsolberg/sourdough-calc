@@ -105,7 +105,6 @@ dialog::backdrop{background:#0008}
 <header>
   <div class="logo"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M12 22V9"/><path d="M12 9c-3-1-4-4-3-7 3 1 4 4 3 7zM12 9c3-1 4-4 3-7-3 1-4 4-3 7z"/><path d="M12 15c-3-.5-5-3-5-6 3 .3 5 3 5 6zM12 15c3-.5 5-3 5-6-3 .3-5 3-5 6z"/></svg></div>
   <h1 data-t="appName">Levain</h1>
-  <button class="hbtn" id="unitBtn">g</button>
   <button class="hbtn" id="awakeBtn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="6" y="2" width="12" height="20" rx="2"/><path d="M10 18h4"/></svg></button>
   <button class="hbtn" id="themeBtn"></button>
 </header>
@@ -303,13 +302,13 @@ const SLIDERS = {
   oil:{min:0,max:15,step:0.5,chips:[4,6,8,10]},
   salt:{min:1,max:3,step:0.1,chips:[1,1.5,2]}
 };
-const OZ = 28.349523125;
 function freshState(style='sourdough'){
   return Object.assign({style,mode:'dough',weight:1000,flourWeight:550,loaves:1,butter:0,eggs:0,sugar:0,
     doughBlend:[['bread',100]],starterBlend:[['bread',100]],notes:'',steps:[]},DEFAULTS[style]);
 }
 let S = load('sd_state') || freshState();
-let prefs = Object.assign({unit:'g',theme:'auto',awake:false},load('sd_prefs')||{});
+let prefs = Object.assign({theme:'auto',awake:false},load('sd_prefs')||{});
+prefs.unit='g';
 let systemDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
 function load(k){try{return JSON.parse(localStorage.getItem(k))}catch(e){return null}}
 function store(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}}
@@ -321,12 +320,11 @@ const el = (tag,attrs={},...kids)=>{const e=document.createElement(tag);for(cons
 const num = v=>{const n=parseFloat(String(v).replace(',','.'));return isFinite(n)?n:0};
 const pct = v=>(Math.round(v*10)/10).toLocaleString(SV?'sv-SE':'en-US',{minimumFractionDigits:1,maximumFractionDigits:1})+'%';
 function fmtW(g){
-  if(prefs.unit==='oz'){const o=g/OZ;return o.toLocaleString(SV?'sv-SE':'en-US',{maximumFractionDigits:o<10?2:1})+' oz'}
   const d = Math.abs(g)<30 ? 1 : 0;
   return (Math.round(g*10**d)/10**d).toLocaleString(SV?'sv-SE':'en-US',{maximumFractionDigits:d})+' g';
 }
-const toUnit = g=>prefs.unit==='oz'?+(g/OZ).toFixed(2):Math.round(g*10)/10;
-const fromUnit = v=>prefs.unit==='oz'?num(v)*OZ:num(v);
+const toUnit = g=>Math.round(g*10)/10;
+const fromUnit = v=>num(v);
 function msgFor(list,v){for(const[lim,m]of list)if(v<=lim+1e-9)return m;return ''}
 function toast(t){const e=$('toast');e.textContent=t;e.classList.add('show');clearTimeout(toast.t);toast.t=setTimeout(()=>e.classList.remove('show'),1600)}
 const native = window.Android;
@@ -382,10 +380,10 @@ function setStyle(st){
   S=Object.assign(freshState(st),keep);renderAll();
 }
 function renderWeight(){
-  const u=prefs.unit;
+  const u='g';
   $('weightLbl').textContent=(S.mode==='dough'?L.weightDough:L.weightFlour)+` (${u})`;
   $('weight').value=toUnit(S.mode==='dough'?S.weight:S.flourWeight);
-  $('weight').step=u==='oz'?'0.1':'10';
+  $('weight').step='10';
   $('loaves').value=S.loaves;
   $('butterLbl').textContent=L.butterU(u);$('sugarLbl').textContent=L.sugarU(u);
   $('butter').value=toUnit(S.butter);$('eggs').value=S.eggs;$('sugar').value=toUnit(S.sugar);
@@ -577,7 +575,7 @@ try{window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change',
 function applyPrefs(){
   document.body.classList.toggle('dark',isDark());
   $('themeBtn').innerHTML=THEME_ICON[prefs.theme];$('themeBtn').setAttribute('aria-label',L.themeNames[prefs.theme]);
-  $('unitBtn').textContent=prefs.unit;$('awakeBtn').classList.toggle('on',prefs.awake);
+  $('awakeBtn').classList.toggle('on',prefs.awake);
   if(native&&native.setDark)native.setDark(isDark());
   store('sd_prefs',prefs);
 }
@@ -599,7 +597,6 @@ $('kitchenBtn').onclick=openKitchen;
 $('addStep').onclick=()=>{S.steps.push({t:'',d:'',m:0});renderSteps();persist();const ins=$('stepList').querySelectorAll('input[type=text]');ins[ins.length-1]?.focus()};
 $('defaultSteps').onclick=()=>{for(const[t,d,m]of L.template)S.steps.push({t,d,m:m||0});renderSteps();persist()};
 $('saveBtn').onclick=saveCurrent;
-$('unitBtn').onclick=()=>{prefs.unit=prefs.unit==='g'?'oz':'g';applyPrefs();renderWeight();renderResults()};
 $('themeBtn').onclick=()=>{prefs.theme={auto:'light',light:'dark',dark:'auto'}[prefs.theme]||'auto';applyPrefs();toast(L.themeNames[prefs.theme])};
 $('awakeBtn').onclick=()=>{prefs.awake=!prefs.awake;applyPrefs();setAwake(prefs.awake)};
 for(const[h,body]of L.learn){const d=el('details',{},el('summary',{textContent:h}));const c=el('div');c.innerHTML=body;d.append(c);$('learnBody').append(d)}
