@@ -1,0 +1,11 @@
+11-14 13:15:32.096   967   967 I AndroidRuntime: VM exiting with result code 0, cleanup skipped.
+11-14 13:16:03.680  4248  4248 D AndroidRuntime: >>>>>> START com.android.internal.os.RuntimeInit uid 2000 <<<<<<
+11-14 13:16:03.694  4248  4248 I AndroidRuntime: Using default boot image
+11-14 13:16:03.694  4248  4248 I AndroidRuntime: Leaving lock profiling enabled
+11-14 13:16:04.106  4248  4248 D AndroidRuntime: Calling main entry com.android.commands.monkey.Monkey
+11-14 13:16:04.920  4248  4248 I AndroidRuntime: VM exiting with result code 0.
+11-14 13:16:23.576  4885  4885 D AndroidRuntime: >>>>>> START com.android.internal.os.RuntimeInit uid 2000 <<<<<<
+11-14 13:16:23.589  4885  4885 I AndroidRuntime: Using default boot image
+11-14 13:16:23.592  4885  4885 I AndroidRuntime: Leaving lock profiling enabled
+11-14 13:16:24.118  4885  4885 D AndroidRuntime: Calling main entry com.android.commands.monkey.Monkey
+11-14 13:16:24.326  4885  4885 I AndroidRuntime: VM exiting with result code 0.
