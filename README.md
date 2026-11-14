@@ -15,3 +15,15 @@ No internet permission – everything is bundled in `app/src/main/assets/index.h
 ## Building
 Push to GitHub – the workflow builds the APK and publishes `Levain.apk` on the `apk` branch.
 Or open the folder in Android Studio and choose *Build → Build APK(s)*.
+
+## License
+
+Copyright © 2026 Jon Solberg
+
+This program is free software: you can redistribute it and/or modify it under the terms of the
+GNU General Public License as published by the Free Software Foundation, either version 3 of the
+License, or (at your option) any later version.
+
+This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+[GNU General Public License](LICENSE) for more details.
