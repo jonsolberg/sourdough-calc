@@ -3,6 +3,12 @@
 A fully offline bread calculator based on baker's percentages.
 No internet permission – everything is bundled in `app/src/main/assets/index.html`.
 
+<p align="center">
+  <img src="docs/screenshot-dough.png" width="250" alt="Levain dough settings">
+  <img src="docs/screenshot-ingredients.png" width="250" alt="Levain ingredient list and baker's percentages">
+  <img src="docs/screenshot-dark.png" width="250" alt="Levain in dark mode">
+</p>
+
 - Breads: sourdough, focaccia (olive oil), pizza (olive oil), enriched (butter, eggs, sugar)
 - Start from dough weight or flour weight, any number of loaves
 - Hydration, starter, starter hydration, salt and oil
