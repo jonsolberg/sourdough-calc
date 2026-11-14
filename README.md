@@ -12,6 +12,10 @@ No internet permission – everything is bundled in `app/src/main/assets/index.h
 - Baking mode with a tick-off list and step timers (uses the phone's clock app)
 - Automatic, light or dark theme; keep-screen-on; English and Swedish (follows the phone language)
 
+## Download
+
+**[Download the latest APK](https://github.com/jonsolberg/sourdough-calc/releases/latest/download/Levain.apk)** · [all releases](https://github.com/jonsolberg/sourdough-calc/releases)
+
 ## Building
 Push to GitHub – the workflow builds the APK and publishes `Levain.apk` on the `apk` branch.
 Or open the folder in Android Studio and choose *Build → Build APK(s)*.
